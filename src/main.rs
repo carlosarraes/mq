@@ -30,9 +30,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let dev_dao = crate::dao::dev::DevDao::new(db_pool.clone());
     let dev_service = Arc::new(crate::services::dev::DevService::new(dev_dao));
+    let projects_dao = crate::dao::projects::ProjectsDao::new(db_pool.clone());
+    let projects_service = Arc::new(crate::services::projects::ProjectsService::new(
+        projects_dao,
+    ));
+
     let app = Router::new()
         .route("/", get(handlers::check::health))
         .nest("/dev", dev::get_routes(dev_service))
+        .nest("/projects", projects::get_routes(projects_service))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(DefaultMakeSpan::default().level(Level::INFO))
