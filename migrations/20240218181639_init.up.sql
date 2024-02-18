@@ -1,4 +1,4 @@
--- Add migration script here
+-- Add up migration script here
 CREATE TABLE IF NOT EXISTS Dev (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL
@@ -20,3 +20,4 @@ CREATE TABLE IF NOT EXISTS Journal (
     FOREIGN KEY (dev_id) REFERENCES Dev(id) ON DELETE CASCADE,
     FOREIGN KEY (project_id) REFERENCES Project(id) ON DELETE CASCADE
 );
+
