@@ -1,11 +1,16 @@
+use crate::routes::{dev, projects};
 use axum::{routing::get, Router};
-use std::error::Error;
+use std::{error::Error, sync::Arc};
 use tower_http::trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse, TraceLayer};
 use tracing::Level;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+mod dao;
 mod db;
 mod handlers;
+mod models;
+mod routes;
+mod services;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -21,10 +26,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let port = std::env::var("PORT").unwrap_or("3000".to_string());
     let addr = format!("0.0.0.0:{port}");
 
-    let _db_pool = crate::db::config::init_db().await?;
+    let db_pool = crate::db::config::init_db().await?;
 
+    let dev_dao = crate::dao::dev::DevDao::new(db_pool.clone());
+    let dev_service = Arc::new(crate::services::dev::DevService::new(dev_dao));
     let app = Router::new()
         .route("/", get(handlers::check::health))
+        .nest("/dev", dev::get_routes(dev_service))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(DefaultMakeSpan::default().level(Level::INFO))
