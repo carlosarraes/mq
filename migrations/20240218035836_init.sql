@@ -1,0 +1,22 @@
+-- Add migration script here
+CREATE TABLE IF NOT EXISTS Dev (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Project (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    emoji TEXT NOT NULL,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Journal (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    day DATE NOT NULL,
+    title TEXT NOT NULL,
+    comment TEXT NOT NULL,
+    dev_id INTEGER,
+    project_id INTEGER,
+    FOREIGN KEY (dev_id) REFERENCES Dev(id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES Project(id) ON DELETE CASCADE
+);
