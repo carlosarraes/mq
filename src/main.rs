@@ -1,4 +1,4 @@
-use crate::routes::{dev, projects};
+use crate::routes::{dev, journal, projects};
 use axum::{routing::get, Router};
 use std::{error::Error, sync::Arc};
 use tower_http::trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse, TraceLayer};
@@ -34,11 +34,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let projects_service = Arc::new(crate::services::projects::ProjectsService::new(
         projects_dao,
     ));
+    let journal_dao = crate::dao::journal::JournalDao::new(db_pool.clone());
+    let journal_service = Arc::new(crate::services::journal::JournalService::new(journal_dao));
 
     let app = Router::new()
         .route("/", get(handlers::check::health))
         .nest("/dev", dev::get_routes(dev_service))
         .nest("/projects", projects::get_routes(projects_service))
+        .nest("/journal", journal::get_routes(journal_service))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(DefaultMakeSpan::default().level(Level::INFO))
