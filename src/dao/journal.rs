@@ -29,7 +29,7 @@ impl JournalDao {
     }
 
     pub async fn get_all(&self) -> Result<Vec<Journal>, sqlx::Error> {
-        let journals = sqlx::query_as!(
+        Ok(sqlx::query_as!(
             Journal,
             r#"
             SELECT 
@@ -47,13 +47,11 @@ impl JournalDao {
             "#
         )
         .fetch_all(&self.pool)
-        .await?;
-
-        Ok(journals)
+        .await?)
     }
 
     pub async fn get_all_by_dev_id(&self, dev_id: i64) -> Result<Vec<Journal>, sqlx::Error> {
-        let journals = sqlx::query_as!(
+        Ok(sqlx::query_as!(
             Journal,
             r#"
             SELECT 
@@ -73,16 +71,14 @@ impl JournalDao {
             dev_id
         )
         .fetch_all(&self.pool)
-        .await?;
-
-        Ok(journals)
+        .await?)
     }
 
     pub async fn get_all_by_project_id(
         &self,
         project_id: i64,
     ) -> Result<Vec<Journal>, sqlx::Error> {
-        let journals = sqlx::query_as!(
+        Ok(sqlx::query_as!(
             Journal,
             r#"
             SELECT 
@@ -102,13 +98,42 @@ impl JournalDao {
             project_id
         )
         .fetch_all(&self.pool)
-        .await?;
+        .await?)
+    }
 
-        Ok(journals)
+    pub async fn get_all_by_dev_id_and_date_range(
+        &self,
+        dev_id: i64,
+        start_date: chrono::NaiveDate,
+        end_date: chrono::NaiveDate,
+    ) -> Result<Vec<Journal>, sqlx::Error> {
+        Ok(sqlx::query_as!(
+            Journal,
+            r#"
+        SELECT 
+            Journal.id, 
+            Journal.day, 
+            Journal.title, 
+            Journal.comment, 
+            Dev.name AS "dev", 
+            Journal.dev_id AS "dev_id!", 
+            Project.name AS "project", 
+            Journal.project_id AS "project_id!"
+        FROM Journal
+        INNER JOIN Dev ON Journal.dev_id = Dev.id
+        INNER JOIN Project ON Journal.project_id = Project.id
+        WHERE Journal.dev_id = ? AND Journal.day BETWEEN ? AND ?
+        "#,
+            dev_id,
+            start_date,
+            end_date
+        )
+        .fetch_all(&self.pool)
+        .await?)
     }
 
     pub async fn get_by_id(&self, id: i64) -> Result<Journal, sqlx::Error> {
-        let journal = sqlx::query_as!(
+        Ok(sqlx::query_as!(
             Journal,
             r#"
             SELECT 
@@ -128,9 +153,7 @@ impl JournalDao {
             id
         )
         .fetch_one(&self.pool)
-        .await?;
-
-        Ok(journal)
+        .await?)
     }
 
     pub async fn update(&self, id: i64, update_journal: JournalDto) -> Result<(), sqlx::Error> {
