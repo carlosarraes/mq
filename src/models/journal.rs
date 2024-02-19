@@ -21,3 +21,9 @@ pub struct JournalDto {
     pub dev_id: i64,
     pub project_id: i64,
 }
+
+#[derive(Deserialize)]
+pub struct DateQuery {
+    pub start_date: chrono::NaiveDate,
+    pub end_date: chrono::NaiveDate,
+}

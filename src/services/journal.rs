@@ -66,6 +66,17 @@ impl JournalService {
         self.dao.get_all_by_dev_id(dev_id).await
     }
 
+    pub async fn get_all_by_dev_id_and_date_range(
+        &self,
+        dev_id: i64,
+        start_date: NaiveDate,
+        end_date: NaiveDate,
+    ) -> Result<Vec<Journal>, sqlx::Error> {
+        self.dao
+            .get_all_by_dev_id_and_date_range(dev_id, start_date, end_date)
+            .await
+    }
+
     pub async fn get_all_by_project_id(
         &self,
         project_id: i64,
@@ -73,14 +84,28 @@ impl JournalService {
         self.dao.get_all_by_project_id(project_id).await
     }
 
-    pub async fn serialize_to_toml(&self, dev_id: i64) -> Result<String, sqlx::Error> {
-        let journals = self.get_all_by_dev_id(dev_id).await?;
+    pub async fn serialize_to_toml(
+        &self,
+        dev_id: i64,
+        start_date: NaiveDate,
+        end_date: NaiveDate,
+    ) -> Result<String, sqlx::Error> {
+        let journals = self
+            .get_all_by_dev_id_and_date_range(dev_id, start_date, end_date)
+            .await?;
         let dev_journal = Self::transform_to_structure(journals).await;
         Ok(Self::serialize_dev_journal_to_toml(dev_journal))
     }
 
-    pub async fn serialize_to_yaml(&self, dev_id: i64) -> Result<String, sqlx::Error> {
-        let journals = self.get_all_by_dev_id(dev_id).await?;
+    pub async fn serialize_to_yaml(
+        &self,
+        dev_id: i64,
+        start_date: NaiveDate,
+        end_date: NaiveDate,
+    ) -> Result<String, sqlx::Error> {
+        let journals = self
+            .get_all_by_dev_id_and_date_range(dev_id, start_date, end_date)
+            .await?;
         let dev_journal = Self::transform_to_structure(journals).await;
         Ok(Self::serialize_dev_journal_to_yaml(dev_journal).unwrap())
     }

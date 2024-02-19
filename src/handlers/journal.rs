@@ -1,11 +1,10 @@
 use std::sync::Arc;
 
-use axum::{extract, http::StatusCode, Json};
-
 use crate::{
-    models::journal::{Journal, JournalDto},
+    models::journal::{DateQuery, Journal, JournalDto},
     services::journal::JournalService,
 };
+use axum::{extract, http::StatusCode, Json};
 
 pub async fn create(
     extract::Extension(service): extract::Extension<Arc<JournalService>>,
@@ -80,9 +79,17 @@ pub async fn delete(
 pub async fn serialize_to_toml(
     extract::Extension(service): extract::Extension<Arc<JournalService>>,
     extract::Path(dev_id): extract::Path<i64>,
+    extract::Query(date_query): extract::Query<DateQuery>,
 ) -> Result<String, StatusCode> {
-    tracing::info!("dev_id: {}", dev_id);
-    match service.serialize_to_toml(dev_id).await {
+    let DateQuery {
+        start_date,
+        end_date,
+    } = date_query;
+
+    match service
+        .serialize_to_toml(dev_id, start_date, end_date)
+        .await
+    {
         Ok(journal) => Ok(journal),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
@@ -91,8 +98,17 @@ pub async fn serialize_to_toml(
 pub async fn serialize_to_yaml(
     extract::Extension(service): extract::Extension<Arc<JournalService>>,
     extract::Path(dev_id): extract::Path<i64>,
+    extract::Query(date_query): extract::Query<DateQuery>,
 ) -> Result<String, StatusCode> {
-    match service.serialize_to_yaml(dev_id).await {
+    let DateQuery {
+        start_date,
+        end_date,
+    } = date_query;
+
+    match service
+        .serialize_to_yaml(dev_id, start_date, end_date)
+        .await
+    {
         Ok(journal) => Ok(journal),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
