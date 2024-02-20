@@ -10,6 +10,7 @@ pub struct Journal {
     pub dev: String,
     pub dev_id: i64,
     pub project: String,
+    pub emoji: String,
     pub project_id: i64,
 }
 

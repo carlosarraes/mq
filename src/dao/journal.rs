@@ -40,6 +40,7 @@ impl JournalDao {
                 Dev.name AS "dev", 
                 Journal.dev_id AS "dev_id!", 
                 Project.name AS "project", 
+                Project.emoji AS "emoji",
                 Journal.project_id AS "project_id!"
             FROM Journal
             INNER JOIN Dev ON Journal.dev_id = Dev.id
@@ -62,6 +63,7 @@ impl JournalDao {
                 Dev.name AS "dev", 
                 Journal.dev_id AS "dev_id!", 
                 Project.name AS "project", 
+                Project.emoji AS "emoji",
                 Journal.project_id AS "project_id!"
             FROM Journal
             INNER JOIN Dev ON Journal.dev_id = Dev.id
@@ -89,6 +91,7 @@ impl JournalDao {
                 Dev.name AS "dev", 
                 Journal.dev_id AS "dev_id!", 
                 Project.name AS "project", 
+                Project.emoji AS "emoji",
                 Journal.project_id AS "project_id!"
             FROM Journal
             INNER JOIN Dev ON Journal.dev_id = Dev.id
@@ -118,6 +121,7 @@ impl JournalDao {
             Dev.name AS "dev", 
             Journal.dev_id AS "dev_id!", 
             Project.name AS "project", 
+            Project.emoji AS "emoji",
             Journal.project_id AS "project_id!"
         FROM Journal
         INNER JOIN Dev ON Journal.dev_id = Dev.id
@@ -144,6 +148,7 @@ impl JournalDao {
                 Dev.name AS "dev", 
                 Journal.dev_id AS "dev_id!", 
                 Project.name AS "project", 
+                Project.emoji AS "emoji",
                 Journal.project_id AS "project_id!"
             FROM Journal
             INNER JOIN Dev ON Journal.dev_id = Dev.id
