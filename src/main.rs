@@ -1,4 +1,5 @@
 use crate::routes::{dev, journal, projects};
+
 use axum::{http::Method, routing::get, Router};
 use std::{error::Error, sync::Arc};
 use tower_http::{
@@ -42,6 +43,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PATCH])
+        .allow_headers(Any)
         .allow_origin(Any);
 
     let app = Router::new()
