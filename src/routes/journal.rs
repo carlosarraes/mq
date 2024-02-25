@@ -13,13 +13,18 @@ pub fn get_routes(service: Arc<JournalService>) -> Router {
             "/",
             post(handlers::journal::create).get(handlers::journal::get_all),
         )
-        .route("/dev/:dev_id", get(handlers::journal::get_by_dev_id))
+        .route("/date", get(handlers::journal::get_all_by_date_range))
+        .route(
+            "/dev/:dev_id",
+            get(handlers::journal::get_all_by_dev_id_and_date_range),
+        )
         .route(
             "/project/:project_id",
             get(handlers::journal::get_by_project_id),
         )
         .route("/toml/:dev_id", get(handlers::journal::serialize_to_toml))
-        .route("/yaml/:dev_id", get(handlers::journal::serialize_to_yaml))
+        .route("/yaml", get(handlers::journal::serialize_to_yaml))
+        .route("/md", get(handlers::journal::serialize_to_md))
         .route(
             "/:id",
             get(handlers::journal::get_by_id)

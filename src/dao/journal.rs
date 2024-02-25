@@ -13,10 +13,11 @@ impl JournalDao {
 
     pub async fn create(&self, insert_journal: JournalDto) -> Result<(), sqlx::Error> {
         let day = insert_journal.day.format("%Y-%m-%d").to_string();
+        tracing::info!("day: {:?}", insert_journal);
 
         sqlx::query!(
-            "INSERT INTO Journal (title, comment, day, dev_id, project_id) VALUES (?,?,?,?,?)",
-            insert_journal.title,
+            "INSERT INTO Journal (status, comment, day, dev_id, project_id) VALUES (?,?,?,?,?)",
+            insert_journal.status,
             insert_journal.comment,
             day,
             insert_journal.dev_id,
@@ -35,7 +36,7 @@ impl JournalDao {
             SELECT 
                 Journal.id, 
                 Journal.day, 
-                Journal.title, 
+                Journal.status,
                 Journal.comment, 
                 Dev.name AS "dev", 
                 Journal.dev_id AS "dev_id!", 
@@ -51,14 +52,18 @@ impl JournalDao {
         .await?)
     }
 
-    pub async fn get_all_by_dev_id(&self, dev_id: i64) -> Result<Vec<Journal>, sqlx::Error> {
+    pub async fn get_all_by_date_range(
+        &self,
+        start_date: chrono::NaiveDate,
+        end_date: chrono::NaiveDate,
+    ) -> Result<Vec<Journal>, sqlx::Error> {
         Ok(sqlx::query_as!(
             Journal,
             r#"
             SELECT 
                 Journal.id, 
                 Journal.day, 
-                Journal.title, 
+                Journal.status, 
                 Journal.comment, 
                 Dev.name AS "dev", 
                 Journal.dev_id AS "dev_id!", 
@@ -68,9 +73,10 @@ impl JournalDao {
             FROM Journal
             INNER JOIN Dev ON Journal.dev_id = Dev.id
             INNER JOIN Project ON Journal.project_id = Project.id
-            WHERE Journal.dev_id = ?
+            WHERE Journal.day BETWEEN ? AND ?
             "#,
-            dev_id
+            start_date,
+            end_date
         )
         .fetch_all(&self.pool)
         .await?)
@@ -86,7 +92,7 @@ impl JournalDao {
             SELECT 
                 Journal.id, 
                 Journal.day, 
-                Journal.title, 
+                Journal.status, 
                 Journal.comment, 
                 Dev.name AS "dev", 
                 Journal.dev_id AS "dev_id!", 
@@ -116,7 +122,7 @@ impl JournalDao {
         SELECT 
             Journal.id, 
             Journal.day, 
-            Journal.title, 
+            Journal.status, 
             Journal.comment, 
             Dev.name AS "dev", 
             Journal.dev_id AS "dev_id!", 
@@ -143,7 +149,7 @@ impl JournalDao {
             SELECT 
                 Journal.id, 
                 Journal.day, 
-                Journal.title, 
+                Journal.status, 
                 Journal.comment, 
                 Dev.name AS "dev", 
                 Journal.dev_id AS "dev_id!", 
@@ -165,8 +171,8 @@ impl JournalDao {
         let day = update_journal.day.format("%Y-%m-%d").to_string();
 
         sqlx::query!(
-            "UPDATE Journal SET title = ?, comment = ?, day = ?, dev_id = ?, project_id = ? WHERE id = ?",
-            update_journal.title,
+            "UPDATE Journal SET status = ?, comment = ?, day = ?, dev_id = ?, project_id = ? WHERE id = ?",
+            update_journal.status,
             update_journal.comment,
             day,
             update_journal.dev_id,

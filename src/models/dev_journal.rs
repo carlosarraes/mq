@@ -1,21 +1,19 @@
-use chrono::NaiveDate;
 use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct DevJournal {
-    pub dev_name: String,
-    pub entries: Vec<Entry>,
-}
-
-#[derive(Serialize)]
-pub struct Entry {
-    pub date: NaiveDate,
     pub projects: Vec<ProjectEntry>,
 }
 
 #[derive(Serialize)]
 pub struct ProjectEntry {
     pub name: String,
+    pub statuses: Vec<StatusEntry>,
+}
+
+#[derive(Serialize)]
+pub struct StatusEntry {
+    pub status: String,
     pub tasks: Vec<TaskEntry>,
 }
 

@@ -25,11 +25,35 @@ pub async fn get_all(
     }
 }
 
-pub async fn get_by_dev_id(
+pub async fn get_all_by_date_range(
+    extract::Extension(service): extract::Extension<Arc<JournalService>>,
+    extract::Query(date_query): extract::Query<DateQuery>,
+) -> Result<Json<Vec<Journal>>, StatusCode> {
+    let DateQuery {
+        start_date,
+        end_date,
+    } = date_query;
+
+    match service.get_all_by_date_range(start_date, end_date).await {
+        Ok(journal) => Ok(Json(journal)),
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
+    }
+}
+
+pub async fn get_all_by_dev_id_and_date_range(
     extract::Extension(service): extract::Extension<Arc<JournalService>>,
     extract::Path(dev_id): extract::Path<i64>,
+    extract::Query(date_query): extract::Query<DateQuery>,
 ) -> Result<Json<Vec<Journal>>, StatusCode> {
-    match service.get_all_by_dev_id(dev_id).await {
+    let DateQuery {
+        start_date,
+        end_date,
+    } = date_query;
+
+    match service
+        .get_all_by_dev_id_and_date_range(dev_id, start_date, end_date)
+        .await
+    {
         Ok(journal) => Ok(Json(journal)),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
@@ -78,7 +102,6 @@ pub async fn delete(
 
 pub async fn serialize_to_toml(
     extract::Extension(service): extract::Extension<Arc<JournalService>>,
-    extract::Path(dev_id): extract::Path<i64>,
     extract::Query(date_query): extract::Query<DateQuery>,
 ) -> Result<String, StatusCode> {
     let DateQuery {
@@ -86,10 +109,7 @@ pub async fn serialize_to_toml(
         end_date,
     } = date_query;
 
-    match service
-        .serialize_to_toml(dev_id, start_date, end_date)
-        .await
-    {
+    match service.serialize_to_toml(start_date, end_date).await {
         Ok(journal) => Ok(journal),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
@@ -97,7 +117,6 @@ pub async fn serialize_to_toml(
 
 pub async fn serialize_to_yaml(
     extract::Extension(service): extract::Extension<Arc<JournalService>>,
-    extract::Path(dev_id): extract::Path<i64>,
     extract::Query(date_query): extract::Query<DateQuery>,
 ) -> Result<String, StatusCode> {
     let DateQuery {
@@ -105,10 +124,22 @@ pub async fn serialize_to_yaml(
         end_date,
     } = date_query;
 
-    match service
-        .serialize_to_yaml(dev_id, start_date, end_date)
-        .await
-    {
+    match service.serialize_to_yaml(start_date, end_date).await {
+        Ok(journal) => Ok(journal),
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
+    }
+}
+
+pub async fn serialize_to_md(
+    extract::Extension(service): extract::Extension<Arc<JournalService>>,
+    extract::Query(date_query): extract::Query<DateQuery>,
+) -> Result<String, StatusCode> {
+    let DateQuery {
+        start_date,
+        end_date,
+    } = date_query;
+
+    match service.serialize_to_md(start_date, end_date).await {
         Ok(journal) => Ok(journal),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
