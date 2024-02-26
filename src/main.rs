@@ -42,7 +42,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let journal_service = Arc::new(crate::services::journal::JournalService::new(journal_dao));
 
     let cors = CorsLayer::new()
-        .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PATCH])
+        .allow_methods([
+            Method::GET,
+            Method::POST,
+            Method::DELETE,
+            Method::PATCH,
+            Method::PUT,
+        ])
         .allow_headers(Any)
         .allow_origin(Any);
 

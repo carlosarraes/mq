@@ -28,7 +28,7 @@ pub fn get_routes(service: Arc<JournalService>) -> Router {
         .route(
             "/:id",
             get(handlers::journal::get_by_id)
-                .patch(handlers::journal::update)
+                .put(handlers::journal::update)
                 .delete(handlers::journal::delete),
         )
         .layer(Extension(service))
